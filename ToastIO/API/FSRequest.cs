@@ -18,12 +18,19 @@ namespace ToastIO.API
         public const int MEMORYPOOL = 1024 * 1024 * 3;  // 内存池大小
         // 属性
         public byte[] buff = new byte[MEMORYPOOL];    // 请求单次传入数据
-        public Socket Request; // 请求的Socket 可能是客户端 也可能是服务端
+        private Socket request; // 请求的Socket 可能是客户端 也可能是服务端
+        public Socket Request { 
+            get => request;
+            set {
+                request = value;
+                Respones = new Respones(request);
+            }
+        }
         public string IP { get => ((IPEndPoint)Request.RemoteEndPoint).Address.ToString(); }    // 请求Socket的IP
         public string Port { get => ((IPEndPoint)Request.RemoteEndPoint).Port.ToString(); }     // 请求Socket的端口
         private List<byte[]> buffCookie = new List<byte[]>();   // 防止数据连接 粘包
         protected Dictionary<long, SourcePackage> pages = new Dictionary<long, SourcePackage>();   // 接收的包体(根据SourceID)
-        public Respones Respones = new Respones();
+        public Respones Respones;
         public DateTime LastBeatTime;   // 最后一次Beat时间 
         public bool IsOpen { get; private set; } = false;   // 是否开启
         // 委托

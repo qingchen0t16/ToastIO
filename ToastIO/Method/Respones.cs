@@ -21,6 +21,12 @@ namespace ToastIO.Method
             get => BitConverter.ToInt64(sourceID, 0);   // byte转换为int后输出
             set => sourceID = BitConverter.GetBytes(value);   // int转回byte 塞给sourceID
         }
+        private Socket socket;
+
+        public Respones() { }
+        public Respones(Socket socket) {
+            this.socket = socket;
+        }
 
         /// <summary>
         /// 发送数据到指定Socket
@@ -51,6 +57,23 @@ namespace ToastIO.Method
                 Replys.Add(sendSourceID == -1 ? SourceID : sendSourceID, new SourcePackage(requestSocket, endReceive));
             
             return sendSourceID == -1 ? SourceID++ : sendSourceID;  // 返回SourceID,如果sourceID是-1就使用当前Respones的sourceID
+        }
+
+        /// <summary>
+        /// 基于FSRequest的发送数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sendType"></param>
+        /// <param name="sendObj"></param>
+        /// <param name="header"></param>
+        /// <param name="sendSourceID"></param>
+        /// <param name="endReceive"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public long Send<T>(SendType sendType, T sendObj, string header = "Null", long sendSourceID = -1, Action<SourcePackage> endReceive = null) {
+            if(socket is null)
+                throw new Exception("无法发送数据，因为Socket是空的");
+            return Send<T>(socket,sendType, sendObj, header, sendSourceID, endReceive);
         }
 
         /// <summary>
